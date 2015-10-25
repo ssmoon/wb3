@@ -8,35 +8,45 @@ const {
   View,
   Navigator,
   TextInput,
-  TouchableHighlight
+  TouchableHighlight,
+  AlertIOS
 } = React;
 import user from '../logics/user';
 
-class WelcomeView extends React.Component {
-  _onPressLogin() {
+let WelcomeView = React.createClass({
+  getInitialState: function() {
+    return { userName: 'vex', userPwd: 'bk009107'};
+  },
 
-  }
+  _onPressLogin: function() {
+    let loginResult = user.login1(this.state.userName, this.state.userPwd);
 
-  _onPressRegister() {
 
-  }
+    //  AlertIOS.alert('提示', loginResult, [ {text: '确定', onPress: () => console.log('Button Pressed!')}, ] );
 
-  render() {
+  },
+
+  _onPressRegister: function() {
+
+  },
+
+  render: function() {
     let userID = user.getCurrUserId();
+    let self = this;
     return (
       <View style={styles.container}>
         <Text style={ styles.welcome }>朗播词汇</Text>
         <View style={ styles.inputline }>
           <Text style={ styles.inputtitle }>姓名:</Text>
-          <TextInput style={ styles.inputbox } placeholder="邮箱，用户名或者手机" value="vex"></TextInput>
+          <TextInput style={ styles.inputbox } onChangeText={(text) => self.userName = text } placeholder="邮箱，用户名或者手机" value="vex"></TextInput>
         </View>
         <View style={ styles.inputline }>
           <Text style={ styles.inputtitle }>姓名:</Text>
-          <TextInput style={ styles.inputbox } placeholder="6-15位登录密码" value="bk009107" secureTextEntry="true"></TextInput>
+          <TextInput style={ styles.inputbox } onChangeText={(text) => self.userPwd = text } placeholder="6-15位登录密码" value="bk009107" secureTextEntry={ true }></TextInput>
         </View>
 
         <View style={ styles.actionbar }>
-          <TouchableHighlight onPress={this._onPressLogin} style={ styles.actionbutton }>
+          <TouchableHighlight onPress={this._onPressLogin.bind(this, this.state.userName) } style={ styles.actionbutton }>
             <Text style={ styles.buttontext }>Login</Text>
           </TouchableHighlight>
           <TouchableHighlight onPress={this._onPressRegister} style={ styles.actionbutton }>
@@ -46,7 +56,7 @@ class WelcomeView extends React.Component {
       </View>
     );
   }
-}
+})
 
 const styles = StyleSheet.create({
   container: {

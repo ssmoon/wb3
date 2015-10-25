@@ -89,3 +89,39 @@ var styles = StyleSheet.create({
 });
 
 AppRegistry.registerComponent('LangBoWordBook3', () => LangBoWordBook3);
+
+
+login(userName, userPwd) {
+  co(function* () {
+    let localUser = yield AsyncStorage.getItem(skey_local_user);
+
+    if (localUser != null) {
+      localUser = JSON.parse(localUser);
+      if ((localUser.name === userName) && (localUser.pwd === userPwd)) {
+        this.uid = localUser.id;
+        return true;
+      }
+    }
+    //validate user by server response
+    let res = yield agent
+      .post(url_user_login)
+      .send(JSON.stringify({ userName: userName, userPwd: userPwd }))
+      .set('Content-Type', 'application/json')
+      .end();
+
+    let loginResult = res.result;
+    if (loginResult.substr(0, 4) === 'FAIL') {
+      return '账号名或者密码错误';
+    }
+    //Persistent to local
+    let userID = loginResult.substr(4, 9);
+    yield AsyncStorage.setItem(skey_local_user, JSON.stringify({ name: userName, pwd: userPwd, id: userID }));
+    return userID;
+  }).then(function (val) {
+    return val;
+  }, function (err) {
+    console.error(err.stack);
+    console.log(err);
+    return '无法连接服务器或登录失败';
+  });
+}
