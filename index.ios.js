@@ -12,13 +12,13 @@ var {
   View,
   Navigator
 } = React;
-import main from './pages/main';
+import Main from './pages/Main';
 
 class LangBoWordBook3 extends React.Component {
     render() {
         return (
             <Navigator
-                initialRoute={{name: 'main', component: main}}
+                initialRoute={{name: 'Main', component: Main}}
                 configureScene={() => {
                     return Navigator.SceneConfigs.FloatFromRight;
                 }}

@@ -9,9 +9,11 @@ const {
   Navigator,
   TextInput,
   TouchableHighlight,
-  AlertIOS
+  AlertIOS,
+  AsyncStorage
 } = React;
-import user from '../logics/user';
+import userMng from '../logics/user-mng';
+import WbCollectionView from './WbCollection';
 
 let WelcomeView = React.createClass({
   getInitialState: function() {
@@ -19,19 +21,22 @@ let WelcomeView = React.createClass({
   },
 
   _onPressLogin: function() {
-    let loginResult = user.login1(this.state.userName, this.state.userPwd);
-
-
-    //  AlertIOS.alert('提示', loginResult, [ {text: '确定', onPress: () => console.log('Button Pressed!')}, ] );
-
+    let self = this;
+    let loginResult = userMng.login1(this.state.userName, this.state.userPwd, function(err, userid) {
+      self.props.navigator.push({
+          name: 'WbCollectionView',
+          component: WbCollectionView
+      });
+    });
   },
 
   _onPressRegister: function() {
-
+    AsyncStorage.clear().then(function() {
+      AlertIOS.alert( 'Foo Title', 'My Alert Msg', [ {text: 'Foo', onPress: () => console.log('Foo Pressed!')}, {text: 'Bar', onPress: () => console.log('Bar Pressed!')}, ] )
+    })
   },
 
   render: function() {
-    let userID = user.getCurrUserId();
     let self = this;
     return (
       <View style={styles.container}>
