@@ -14,3 +14,6 @@ export function getPhaseCNName(wordBookStatus) {
     case 21: return '查漏补缺阶段';
   }
 }
+
+export const WordListSortType_Familiarity = 'familiarity';
+export const WordListSortType_FirstLetter = 'firstletter';

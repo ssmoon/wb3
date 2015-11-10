@@ -17,6 +17,7 @@ import wbCollectionMng from '../logics/wb-collection-mng';
 import WbCell from '../components/WbItemCell';
 import FullScreenLoading from '../components/FullScreenLoading';
 import wbCurrentMng from '../logics/wb-current-mng';
+import WbPreface from './WbPreface';
 
 let WbCollectionView = React.createClass({
   getInitialState: function() {
@@ -65,8 +66,14 @@ let WbCollectionView = React.createClass({
   },
 
   selectWordBook: function(wb) {
+    let self = this;
+    self.setState({ isLoading: true });
     wbCurrentMng.initWordBookData(wb, function() {
-
+      self.setState({ isLoading: false });
+      self.props.navigator.push({
+          name: 'WbPreface',
+          component: WbPreface
+      });
     })
   },
 
