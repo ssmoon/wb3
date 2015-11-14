@@ -15,5 +15,12 @@ export function getPhaseCNName(wordBookStatus) {
   }
 }
 
+export function padLeft(str, totalLen) {
+  str = ''  + str;
+  while (str.length < totalLen)
+    str = ' ' + str;
+  return str;
+}
+
 export const WordListSortType_Familiarity = 'familiarity';
 export const WordListSortType_FirstLetter = 'firstletter';

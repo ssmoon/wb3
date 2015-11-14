@@ -14,6 +14,7 @@ import FullScreenLoading from '../components/FullScreenLoading';
 import wbCurrentMng from '../logics/wb-current-mng';
 import DailyTask from '../components/DailyTask';
 import WbShowByPhase from '../components/WbShowByPhase';
+import P1Recite from '../pages/P1Recite';
 import * as constDefine from '../utils/const';
 
 let WbPrefaceView = React.createClass({
@@ -34,6 +35,31 @@ let WbPrefaceView = React.createClass({
         isLoading: false
       });
     })
+  },
+
+  _onSelectList: function(task, listId) {
+    let self = this;
+    wbCurrentMng.buildWordCollectionFromList(task, listId, function(err) {
+      if (err) {
+        throw err;
+      }
+      self.props.navigator.push({
+          name: 'P1Recite',
+          component: P1Recite,
+          callback: self.recalcFirstTask
+      });
+    })
+  },
+
+  recalcFirstTask: function() {
+    let self = this;
+    wbCurrentMng.getFirstUnfinishedTask(function(err, task) {
+      let parts = wbCurrentMng.buildP2WordPart();
+      self.setState({
+        parts: parts,
+        task: task
+      });
+    });
   },
 
   render: function() {
@@ -69,7 +95,14 @@ let WbPrefaceView = React.createClass({
         </View>
         { familiaritySection }
 
-        { this.state.isLoading ? <FullScreenLoading></FullScreenLoading> : <WbShowByPhase wb={ wb } parts={ this.state.parts } task={ this.state.task }></WbShowByPhase> }
+        { this.state.isLoading ? <FullScreenLoading></FullScreenLoading> :
+          <WbShowByPhase
+            wb={ wb }
+            parts={ this.state.parts }
+            task={ this.state.task }
+            selectListHandler={ this._onSelectList }>
+          </WbShowByPhase>
+        }
       </View>
     )
   }

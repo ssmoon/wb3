@@ -22,6 +22,18 @@ const storageAssetDefine = {
     return skey_userwb_prefix + wordBookID + '#modified';
   },
 
+
+
+  getToSyncWord: function(wordBookID) {
+    return 'sync#' + wordBookID + '#word';
+  },
+
+  getToSyncList: function(wordBookID) {
+    return 'sync#' + wordBookID + '#list';
+  },
+
+
+
   getSysDbDir: function() {
     return RNFS.DocumentDirectoryPath + '/sysdb/';
   },

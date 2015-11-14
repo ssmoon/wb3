@@ -9,18 +9,10 @@ const {
   TouchableHighlight
 } = React;
 
-import P1Recite from '../pages/P1Recite';
 import wbCurrentMng from '../logics/wb-current-mng';
 
 let DailyTask = React.createClass({
-  _onSelectList: function(task, listId) {
-    wbCurrentMng.buildWordCollectionFromList(task, listId, function() {
-      self.props.navigator.push({
-          name: 'P1Recite',
-          component: P1Recite
-      });
-    })
-  },
+
 
   render: function() {
     let self = this;
@@ -41,7 +33,7 @@ let DailyTask = React.createClass({
           <View style={ styles.listContainer }>
             {newLists.map((list) => {
               return (
-                <TouchableHighlight onPress={self._onSelectList.bind(this, self.props.task, list.L)} key={ list.L }>
+                <TouchableHighlight onPress={self.props.selectListHandler.bind(null, self.props.task, list.L)} key={ list.L }>
                   <View style={ styles.listitem }>
                     <View style={ styles.listidx }>
                       <Text>List { list.L }</Text>
@@ -66,7 +58,7 @@ let DailyTask = React.createClass({
           <View style={ styles.listContainer }>
             {reviewLists.map((list) => {
               return (
-                <TouchableHighlight onPress={self._onSelectList.bind(this, self.props.task, list.L)} key={ list.L }>
+                <TouchableHighlight onPress={self.props.selectListHandler.bind(null, self.props.task, list.L)} key={ list.L }>
                   <View style={ styles.listitem }>
                     <View style={ styles.listidx }>
                       <Text>List { list.L }</Text>

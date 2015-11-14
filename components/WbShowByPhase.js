@@ -15,7 +15,7 @@ let WbShowByPhase = React.createClass({
     let wb = this.props.wb;
     if (wb.CurrStatus <= 11) {
       return (
-        <DailyTask task={ this.props.task }></DailyTask>
+        <DailyTask selectListHandler={ this.props.selectListHandler } task={ this.props.task }></DailyTask>
       )
     }
     else {

@@ -4,7 +4,9 @@ const RNFS = require('react-native-fs');
 import React from 'react-native';
 import * as urls from '../config/config';
 import * as storageAssetDefine from '../utils/assets';
-import wordCollectionMng from './word-collection-mng';
+import * as constDefine from '../utils/const';
+let wordCollectionMng = require('../logics/word-collection-mng');
+
 const {
   AsyncStorage
 } = React;
@@ -217,6 +219,42 @@ let currWordBookMng = {
     return parts;
   },
 
+  persistModifiedWords: function(words) {
+    let self = this;
+    return new Promise((resolve, reject) => {
+      //persist to in-memory curr word table;
+      //persist to unsynced word list
+
+      //return: unsynced words, it may useful in the following actions
+      console.log('entering list...there is unmerged words:' + JSON.stringify(words));
+      self.wordTable = Object.assign(self.wordTable, words);
+      let unsyncedWords = null;
+      Promise.all([
+        AsyncStorage.getItem(storageAssetDefine.getToSyncWord(self.currUserWb.Id)),
+        AsyncStorage.setItem(storageAssetDefine.getUserWordCollection(self.currUserWb.Id), JSON.stringify(self.wordTable))
+      ]).then(function(results) {
+        unsyncedWords = results[0];
+        let promiseArr = [];
+        if (unsyncedWords) {
+          unsyncedWords = JSON.parse(unsyncedWords);
+          unsyncedWords = Object.assign(unsyncedWords, words);
+        }
+        else {
+          unsyncedWords = words;
+        }
+        promiseArr.push(AsyncStorage.setItem(storageAssetDefine.getToSyncWord(self.currUserWb.Id), JSON.stringify(words)));
+        //remove modfied word temp key
+        promiseArr.push(AsyncStorage.removeItem(storageAssetDefine.getUserModifiedWord(self.currUserWb.Id)));
+        return Promise.all(promiseArr);
+      }).then(function() {
+        console.log('current unsynced words: ' + JSON.stringify(unsyncedWords));
+        resolve(unsyncedWords);
+      }).catch(function(e) {
+        reject(e);
+      })
+    })
+  },
+
   //invoked when user clicks a List in P1
   buildWordCollectionFromList: function(task, listId, callback) {
     let self = this;
@@ -228,23 +266,97 @@ let currWordBookMng = {
         self.currP1List = list;
       }
     })
+
+    let wordIds = null;
+    let sysWordHash = null;
+
+    //three promise refer to:
+    //1. load curr list's word ids,
+    //2. load sys word hash object, in order to get word mean, symbol and so on
+    //3. check if there is any unmerged (merge to main user word collection) words
     Promise.all([
       AsyncStorage.getItem(storageAssetDefine.getUserWordListMap(self.currUserWb.Id, listId)),
-      RNFS.readFile(storageAssetDefine.getSysDbPath(self.currUserWb.DictType))
+      RNFS.readFile(storageAssetDefine.getSysDbPath(self.currUserWb.DictType)),
+      AsyncStorage.getItem(storageAssetDefine.getUserModifiedWord(self.currUserWb.Id))
     ]).then(function(results) {
-      let wordIds = JSON.parse(results[0]);
-      let sysWordHash = JSON.parse(results[1]);
+      wordIds = JSON.parse(results[0]);
+      sysWordHash = JSON.parse(results[1]);
+      let unMergedCollection = results[2];
 
-      wordCollectionMng.wordCollection = {};
-      wordIds.forEach((wordId) => {
-        let userWord = self.currUserWb[wordId];
-        wordCollectionMng.wordCollection[userWord.W] =
-        {
-          U: self.currUserWb[wordId],
-          S: sysWordHash[wordId]
+      if (unMergedCollection) {
+        //there is unmerged words, merge them to main user word collection and persistent it
+        return self.persistModifiedWords(JSON.parse(unMergedCollection));
+      }
+      else return Promise.reject('ready');
+    }).then(function() {
+      return Promise.reject('ready');
+    }).catch(function(ex) {
+      if (ex === 'ready') {
+        let wordCollection = [];
+        wordIds.forEach((wordId) => {
+          let userWord = self.wordTable[wordId];
+          wordCollection.push(
+          {
+            U: userWord,
+            S: sysWordHash[wordId],
+            //Correct is the correct choice of selection mode
+            //all selection choices lies under Word.S.C , 4 elements array of string
+            //the first choice is always the correct one,
+            //save it temperally to Correct property, because the array of 4 will be randomly sorted before displaying
+            Correct: sysWordHash[wordId].C[0]
+          });
+        })
+        wordCollectionMng.initNewCollection(self.currUserWb.Id, wordCollection);
+        callback(null);
+      }
+      else {
+        console.log(ex);
+        callback(ex);
+      }
+    });
+  },
+
+  //target is surely currP1List
+  markListComplete: function(callback) {
+    let self = this;
+    if (this.currP1List.C === 1) {
+      callback();
+      return;
+    }
+    self.currP1List.C = 1;
+    let unsyncedLists = null;
+    Promise.all([
+      AsyncStorage.getItem(storageAssetDefine.getUserWordSchedule(this.currUserWb.Id)),
+      AsyncStorage.getItem(storageAssetDefine.getToSyncList(self.currUserWb.Id))
+    ]).then(function(results) {
+      let tasks = results[0];
+      unsyncedLists = results[1];
+      if (unsyncedLists) {
+        unsyncedLists = JSON.parse(unsyncedLists);
+        unsyncedLists.push('' + self.currP1List.R + constDefine.padLeft(self.currP1List.L, 2));
+      }
+      else {
+        unsyncedLists = ['' + self.currP1List.R + constDefine.padLeft(self.currP1List.L, 2)]
+      }
+      tasks = JSON.parse(tasks);
+      //loop all task and list to find the target, mark as complete
+      tasks.forEach((task) => {
+        if (task.T === self.currP1Task.T) {
+          task.S.forEach((list) => {
+            if (list.L == self.currP1List.L) {
+              list.C = 1;
+            }
+          })
         }
       })
-      callback(null);
+      return Promise.all([
+        AsyncStorage.setItem(storageAssetDefine.getUserWordSchedule(self.currUserWb.Id), JSON.stringify(tasks)),
+        AsyncStorage.setItem(storageAssetDefine.getToSyncList(self.currUserWb.Id), JSON.stringify(unsyncedLists))
+      ])
+    }).then(function() {
+      callback(unsyncedLists);
+    }).catch(function(e) {
+      callback(e);
     })
   }
 }
