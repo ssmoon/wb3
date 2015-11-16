@@ -21,6 +21,7 @@ let currWordBookMng = {
   currP1Task: null,
   currP1List: null,
   currP2Part: null,
+  currP2SubIndex: 0,
 
   ensureSysDataExist: function(wordBookType, callback) {
     let self = this;
@@ -294,6 +295,60 @@ let currWordBookMng = {
       if (ex === 'ready') {
         let wordCollection = [];
         wordIds.forEach((wordId) => {
+          let userWord = self.wordTable[wordId];
+          wordCollection.push(
+          {
+            U: userWord,
+            S: sysWordHash[wordId],
+            //Correct is the correct choice of selection mode
+            //all selection choices lies under Word.S.C , 4 elements array of string
+            //the first choice is always the correct one,
+            //save it temperally to Correct property, because the array of 4 will be randomly sorted before displaying
+            Correct: sysWordHash[wordId].C[0]
+          });
+        })
+        wordCollectionMng.initNewCollection(self.currUserWb.Id, wordCollection);
+        callback(null);
+      }
+      else {
+        console.log(ex);
+        callback(ex);
+      }
+    });
+  },
+
+  //partIndex count from 1
+  buildWordCollectionFromPart: function(part, partIndex, callback) {
+    let self = this;
+    //taskId is equals to Task Index of the schedule
+
+    self.currP2Part = part;
+    self.currP2SubIndex = partIndex;
+
+    let wordIds = null;
+    let sysWordHash = null;
+    let subPart = self.currP2Part.subs[partIndex - 1];
+    //two promise refer to:
+    //1. load sys word hash object, in order to get word mean, symbol and so on
+    //2. check if there is any unmerged (merge to main user word collection) words
+    Promise.all([
+      RNFS.readFile(storageAssetDefine.getSysDbPath(self.currUserWb.DictType)),
+      AsyncStorage.getItem(storageAssetDefine.getUserModifiedWord(self.currUserWb.Id))
+    ]).then(function(results) {
+      sysWordHash = JSON.parse(results[0]);
+      let unMergedCollection = results[1];
+
+      if (unMergedCollection) {
+        //there is unmerged words, merge them to main user word collection and persistent it
+        return self.persistModifiedWords(JSON.parse(unMergedCollection));
+      }
+      else return Promise.reject('ready');
+    }).then(function() {
+      return Promise.reject('ready');
+    }).catch(function(ex) {
+      if (ex === 'ready') {
+        let wordCollection = [];
+        subPart.forEach((wordId) => {
           let userWord = self.wordTable[wordId];
           wordCollection.push(
           {

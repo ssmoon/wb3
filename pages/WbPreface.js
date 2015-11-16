@@ -15,6 +15,7 @@ import wbCurrentMng from '../logics/wb-current-mng';
 import DailyTask from '../components/DailyTask';
 import WbShowByPhase from '../components/WbShowByPhase';
 import P1Recite from '../pages/P1Recite';
+import P2Recite from '../pages/P2Recite';
 import * as constDefine from '../utils/const';
 
 let WbPrefaceView = React.createClass({
@@ -47,6 +48,20 @@ let WbPrefaceView = React.createClass({
           name: 'P1Recite',
           component: P1Recite,
           callback: self.recalcFirstTask
+      });
+    })
+  },
+
+  _onSelectPart: function(part, partIndex) {
+    let self = this;
+    wbCurrentMng.buildWordCollectionFromPart(part, partIndex, function(err) {
+      if (err) {
+        throw err;
+      }
+      self.props.navigator.push({
+          name: 'P2Recite',
+          component: P2Recite,
+          callback: null
       });
     })
   },
@@ -100,7 +115,8 @@ let WbPrefaceView = React.createClass({
             wb={ wb }
             parts={ this.state.parts }
             task={ this.state.task }
-            selectListHandler={ this._onSelectList }>
+            selectListHandler={ this._onSelectList }
+            selectPartHandler={ this._onSelectPart }>
           </WbShowByPhase>
         }
       </View>

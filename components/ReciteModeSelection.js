@@ -14,7 +14,6 @@ const {
 } = React;
 
 import * as constants from '../utils/const';
-import ReciteBottomNavigator from './ReciteBottomNavigator';
 import ReciteBottomFSwitcher from './ReciteBottomFSwitcher';
 
 //play: http://7xnw4p.com1.z0.glb.clouddn.com/play.png
@@ -98,15 +97,6 @@ let ReciteModeSelection = React.createClass({
           word = { this.props.context.word }
           changeFaimliarityHandler={ this.props.changeFaimliarityHandler }
         ></ReciteBottomFSwitcher>
-        <ReciteBottomNavigator
-          goNextWordHandler={ this.props.goNextWordHandler }
-          goPrevWordHandler={ this.props.goPrevWordHandler }
-          goNextStepHandler={ this.props.goNextStepHandler }
-          goPrevStepHandler={ this.props.goPrevWordHandler }
-          finishListHandler={ this.props.finishListHandler }
-          reciteStep={ this.props.reciteStep }
-          context={ this.props.context }>
-        ></ReciteBottomNavigator>
       </View>
     )
   }

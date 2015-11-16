@@ -20,6 +20,7 @@ import wbCurrentMng from '../logics/wb-current-mng';
 import ReciteModeSingle from '../components/ReciteModeSingle'
 import ReciteModeSelection from '../components/ReciteModeSelection'
 import ReciteModeList from '../components/ReciteModeList'
+import ReciteBottomP1Navigator from '../components/ReciteBottomP1Navigator'
 
 let P1Recite = React.createClass({
   getInitialState: function() {
@@ -116,14 +117,8 @@ let P1Recite = React.createClass({
       case 5: {
         reciteView = (
           <ReciteModeList
-            goNextWordHandler={ this._goNextWordPressed }
-            goPrevWordHandler={ this._goPrevWordPressed }
-            goNextStepHandler={ this._goNextStepPressed }
-            goPrevStepHandler={ this._goPrevStepPressed }
-            finishListHandler={ this._finishListPressed }
             changeFaimliarityHandler={ this._changeFamiliarityPressed }
             context={ wordCollectionMng.getAllWords() }
-            reciteStep={ this.state.reciteStep }
           ></ReciteModeList>
         );
         break;
@@ -131,13 +126,7 @@ let P1Recite = React.createClass({
       case 1: {
         reciteView = (
           <ReciteModeSingle
-            goNextWordHandler={ this._goNextWordPressed }
-            goPrevWordHandler={ this._goPrevWordPressed }
-            goNextStepHandler={ this._goNextStepPressed }
-            goPrevStepHandler={ this._goPrevStepPressed }
-            finishListHandler={ this._finishListPressed }
             changeFaimliarityHandler={ this._changeFamiliarityPressed }
-            reciteStep={ this.state.reciteStep }
             context={ this.state.context }>
           </ReciteModeSingle>
         );
@@ -146,13 +135,7 @@ let P1Recite = React.createClass({
       case 2: {
         reciteView = (
           <ReciteModeSingle
-            goNextWordHandler={ this._goNextWordPressed }
-            goPrevWordHandler={ this._goPrevWordPressed }
-            goNextStepHandler={ this._goNextStepPressed }
-            goPrevStepHandler={ this._goPrevStepPressed }
-            finishListHandler={ this._finishListPressed }
             changeFaimliarityHandler={ this._changeFamiliarityPressed }
-            reciteStep={ this.state.reciteStep }
             context={ this.state.context }>
           </ReciteModeSingle>
         );
@@ -161,13 +144,7 @@ let P1Recite = React.createClass({
       case 4: {
         reciteView = (
           <ReciteModeSingle
-            goNextWordHandler={ this._goNextWordPressed }
-            goPrevWordHandler={ this._goPrevWordPressed }
-            goNextStepHandler={ this._goNextStepPressed }
-            goPrevStepHandler={ this._goPrevStepPressed }
-            finishListHandler={ this._finishListPressed }
             changeFaimliarityHandler={ this._changeFamiliarityPressed }
-            reciteStep={ this.state.reciteStep }
             context={ this.state.context }>
           </ReciteModeSingle>
         );
@@ -176,13 +153,7 @@ let P1Recite = React.createClass({
       case 3: {
         reciteView = (
           <ReciteModeSelection
-            goNextWordHandler={ this._goNextWordPressed }
-            goPrevWordHandler={ this._goPrevWordPressed }
-            goNextStepHandler={ this._goNextStepPressed }
-            goPrevStepHandler={ this._goPrevStepPressed }
-            finishListHandler={ this._finishListPressed }
             changeFaimliarityHandler={ this._changeFamiliarityPressed }
-            reciteStep={ this.state.reciteStep }
             context={ this.state.context }>
           </ReciteModeSelection>
         );
@@ -191,13 +162,7 @@ let P1Recite = React.createClass({
       case 6: {
         reciteView = (
           <ReciteModeSelection
-            goNextWordHandler={ this._goNextWordPressed }
-            goPrevWordHandler={ this._goPrevWordPressed }
-            goNextStepHandler={ this._goNextStepPressed }
-            goPrevStepHandler={ this._goPrevStepPressed }
-            finishListHandler={ this._finishListPressed }
             changeFaimliarityHandler={ this._changeFamiliarityPressed }
-            reciteStep={ this.state.reciteStep }
             context={ this.state.context }>
           </ReciteModeSelection>
         );
@@ -219,6 +184,15 @@ let P1Recite = React.createClass({
           </TouchableHighlight>
         </View>
         { reciteView }
+        <ReciteBottomP1Navigator
+          goNextWordHandler={ this._goNextWordPressed }
+          goPrevWordHandler={ this._goPrevWordPressed }
+          goNextStepHandler={ this._goNextStepPressed }
+          goPrevStepHandler={ this._goPrevStepPressed }
+          finishListHandler={ this._finishListPressed }
+          reciteStep={ this.state.reciteStep }
+          context={ this.state.context }>
+        </ReciteBottomP1Navigator>
       </View>
     )
   }

@@ -12,8 +12,6 @@ const {
 import wbCurrentMng from '../logics/wb-current-mng';
 
 let DailyTask = React.createClass({
-
-
   render: function() {
     let self = this;
     let newLists = [];

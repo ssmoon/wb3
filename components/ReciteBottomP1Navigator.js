@@ -13,7 +13,7 @@ const {
   TouchableWithoutFeedback
 } = React;
 
-let ReciteBottomNavigator = React.createClass({
+let ReciteBottomP1Navigator = React.createClass({
   render: function() {
     //default for step: 5
     let prevNavigator = (
@@ -106,4 +106,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default ReciteBottomNavigator;
+export default ReciteBottomP1Navigator;

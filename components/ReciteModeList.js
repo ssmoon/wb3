@@ -15,7 +15,6 @@ const {
 
 import * as constants from '../utils/const';
 import WordCell from '../components/WordCell';
-import ReciteBottomNavigator from './ReciteBottomNavigator';
 
 const familiarityArr = [ 0, 1, 2, 3, 4 ];
 //play: http://7xnw4p.com1.z0.glb.clouddn.com/play.png
@@ -82,15 +81,6 @@ let ReciteModeSelection = React.createClass({
            keyboardShouldPersistTaps={true}
            showsVerticalScrollIndicator={false}
          />
-         <ReciteBottomNavigator
-           goNextWordHandler={ this.props.goNextWordHandler }
-           goPrevWordHandler={ this.props.goPrevWordHandler }
-           goNextStepHandler={ this.props.goNextStepHandler }
-           goPrevStepHandler={ this.props.goPrevWordHandler }
-           finishListHandler={ this.props.finishListHandler }
-           reciteStep={ this.props.reciteStep }
-           context={ this.props.context }>
-         ></ReciteBottomNavigator>
       </View>
 
     );

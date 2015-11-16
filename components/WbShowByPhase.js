@@ -9,6 +9,7 @@ const {
   ActivityIndicatorIOS
 } = React;
 import DailyTask from './DailyTask';
+import P2Task from './P2Task';
 
 let WbShowByPhase = React.createClass({
   render: function() {
@@ -20,7 +21,7 @@ let WbShowByPhase = React.createClass({
     }
     else {
       return (
-        <View></View>
+        <P2Task selectPartHandler={ this.props.selectPartHandler } parts={ this.props.parts }></P2Task>
       )
     }
   }
